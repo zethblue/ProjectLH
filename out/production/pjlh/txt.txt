@@ -1,0 +1,57 @@
+Clan:
+
+Buildings
+Follower
+Diplomatic Relations
+
+
+
+Follower:
+can be:
+Swordsman
+Mages
+Archers
+Miners
+Teachers
+Crafters/Smiths
+
+meaning, we need:
+Talent for every single weapon
+Talent for every single Mage-tree
+Talent for teaching
+talent for Mining
+Talent for Crafting-trees
+Talent for Smithing
+every Follower can learn everything, combine what you will
+
+Skillpoints for:
+Monster-Detection (monsters can make surprise attacks for first hit)
+every single weapon, magic, teaching, mining,crafting, smithing
+Swimming (maybe used in some dungeons)
+Riding (maybe used for Quests, better Riding Skill = better Fight from horse and faster Questing)
+Strength (more Strength for Battle and carrying better gear, better Mining, better Smithing)
+Dexterity (better Hits, better Evasion, better Crafting, better Smithing)
+Int (better Magic, better teaching, better crafting, more MP Regeneration)
+Vit (more health, better Defense in fights)
+
+Followers have:
+HP and MP
+possible Status (asleep, tired, wounded, poisoned, frozen, burned, paralyzed, stoned, drunk, fear, etc.)
+
+
+
+Dungeons n Fields:
+Lavadungeons - fire monsters
+Ice Dungeons - ice monsters
+Water Dungeons - water/ice monsters
+Old Ruins - all monsters possible
+Wood Dungeon - Plant/Poison Monsters, Brute Monsters
+
+Magic:
+Elemental Fire Magic (Fire-attacks + buff attack)
+Elemental Water Magic (Water-attacks + Regeneration Magic)
+Elemental Wind Magic (Wind-Attacks + Evasion Magic)
+Elemental Earth Magic (Earth-Attacks + buff defense)
+Status Magic (sleep, poison, paralyze, fear, Anti-Statusmagic)
+White Magic (Healing, Turn Undead)
+
