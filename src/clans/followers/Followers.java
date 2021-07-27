@@ -1,33 +1,51 @@
 package clans.followers;
 
+import clans.followers.skillpoints.Magicskills;
+import clans.followers.skillpoints.Skills;
+import clans.followers.talents.Talents;
+
+import java.util.EnumMap;
+
 public class Followers {
 
     private String name;
     private boolean isMale;
-    private TalentRing talentRing;
-    private SkillpointRing skillpointRing;
+    private EnumMap<Talents,Integer> talents;
+    private EnumMap<Magicskills,Integer> magieSkills;
+    private EnumMap<Skills,Integer> skills;
     private ExpRing expRing;
     private StatsRing statsRing;
-    //Equipring!
+    //TODO: Equipring!
 
-    public TalentRing getTalentRing() {
-        return talentRing;
-    }
 
-    public void setTalentRing(TalentRing talentRing) {
-        this.talentRing = talentRing;
-    }
+    /**
+     * do not create with "new" - create with FollowerCreationService!
+     */
+    public Followers() {}
 
-    public SkillpointRing getSkillpointRing() {
-        return skillpointRing;
-    }
-
-    public void setSkillpointRing(SkillpointRing skillpointRing) {
-        this.skillpointRing = skillpointRing;
-    }
 
     public ExpRing getExpRing() {
         return expRing;
+    }
+
+    public void setTalents(EnumMap<Talents, Integer> talents) {
+        this.talents = talents;
+    }
+
+    public EnumMap<Magicskills, Integer> getMagieSkills() {
+        return magieSkills;
+    }
+
+    public void setMagieSkills(EnumMap<Magicskills, Integer> magieSkills) {
+        this.magieSkills = magieSkills;
+    }
+
+    public EnumMap<Skills, Integer> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(EnumMap<Skills, Integer> skills) {
+        this.skills = skills;
     }
 
     public void setExpRing(ExpRing expRing) {
@@ -57,4 +75,9 @@ public class Followers {
     public void setMale(boolean male) {
         isMale = male;
     }
+
+    public EnumMap<Talents, Integer> getTalents() {
+        return talents;
+    }
+
 }

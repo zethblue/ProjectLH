@@ -1,8 +1,11 @@
 package clans.followers.followerservices;
 
 import clans.followers.*;
-import clans.followers.skillpointring.*;
+import clans.followers.skillpoints.*;
+import clans.followers.talents.Talents;
 
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Random;
 
 
@@ -19,9 +22,10 @@ public class FollowerCreationService {
 
     public static Followers createLvl1Random(){
         Followers follower = createFollowerBase();
-        createRandomTalents(follower.getTalentRing(),20);
-        createRandomSkillpoints(follower.getSkillpointRing(),25);
+        createRandomTalents(follower.getTalents(),20);
+        createRandomSkillpoints(follower.getSkills(), follower.getMagieSkills(), 25);
         createRandomStatPoints(follower.getStatsRing(),25);
+        controlMinMaxWerteSkills(follower.getSkills(), follower.getMagieSkills());
 
         return follower;
     }
@@ -36,13 +40,11 @@ public class FollowerCreationService {
     //private methods to work with the big methods
     private static void loadAllRings(Followers follower){
 
-        follower.setSkillpointRing(new SkillpointRing());
-        follower.getSkillpointRing().setEarthMagicSkillpointRing(new EarthMagicSkillpointRing());
-        follower.getSkillpointRing().setFireMagicSkillpointRing(new FireMagicSkillpointRing());
-        follower.getSkillpointRing().setWaterMagicSkillpointRing(new WaterMagicSkillpointRing());
-        follower.getSkillpointRing().setWindMagicSkillpointRing(new WindMagicSkillpointRing());
-        follower.getSkillpointRing().setStatusMagicSkillpointRing(new StatusMagicSkillpointRing());
-        follower.getSkillpointRing().setWhiteMagicSkillpointRing(new WhiteMagicSkillpointRing());
+        EnumMap<Skills, Integer> skillsIntegerEnumMap = createSkillsEnumMap();
+        EnumMap<Magicskills,Integer> magicskillsEnumMap = createMagicEnumMap();
+
+        follower.setSkills(skillsIntegerEnumMap);
+        follower.setMagieSkills(magicskillsEnumMap);
         StatsRing sr = new StatsRing();
         sr.setBasehp(100);
         sr.setBasemp(10);
@@ -53,36 +55,22 @@ public class FollowerCreationService {
         follower.setStatsRing(sr);
         follower.setExpRing(new ExpRing());
         follower.getExpRing().levelup();
-        follower.setTalentRing(new TalentRing());
+        EnumMap<Talents,Integer> talents = new EnumMap(Talents.class);
+        for(Talents t : Talents.values()){
+            talents.put(t,0);
+        }
+        follower.setTalents(talents);
     }
-    private static void createRandomTalents(TalentRing talentRing, int talentpoints){
+    private static void createRandomTalents(EnumMap<Talents,Integer> talentMap, int talentpoints){
         while(talentpoints > 0){
             talentpoints--;
-            randomTalentsSwitch(talentRing,1);
+            randomTalentsSwitch(talentMap,1);
             }
     }
-    private static void randomTalentsSwitch(TalentRing talentRing, int i){
-        switch (random.nextInt(17)){
-            case 0: talentRing.setBowTalent(talentRing.getBowTalent()+i);break;
-            case 1: talentRing.setDaggerTalent(talentRing.getDaggerTalent()+i);break;
-            case 2: talentRing.setAlchemy(talentRing.getAlchemy()+i);break;
-            case 3: talentRing.setElementalEarthMagic(talentRing.getElementalEarthMagic()+i);break;
-            case 4: talentRing.setElementalFireMagic(talentRing.getElementalFireMagic()+i);break;
-            case 5: talentRing.setElementalWaterMagic(talentRing.getElementalWaterMagic()+i);break;
-            case 6: talentRing.setStatusMagic(talentRing.getStatusMagic()+i);break;
-            case 7: talentRing.setWhiteMagic(talentRing.getWhiteMagic()+i);break;
-            case 8: talentRing.setSingleHandMaceTalent(talentRing.getSingleHandMaceTalent()+i);break;
-            case 9: talentRing.setEnchantment(talentRing.getEnchantment()+i);break;
-            case 10: talentRing.setTwoHandSwordTalent(talentRing.getTwoHandSwordTalent()+i);break;
-            case 11: talentRing.setTeaching(talentRing.getTeaching()+i);break;
-            case 12: talentRing.setElementalWindMagic(talentRing.getElementalWindMagic()+i);break;
-            case 13: talentRing.setMining(talentRing.getMining()+i);break;
-            case 14: talentRing.setSmithingWeapons(talentRing.getSmithingWeapons()+i);break;
-            case 15: talentRing.setSingleHandswordTalent(talentRing.getSingleHandswordTalent()+i);break;
-            case 16: talentRing.setSmithingArmors(talentRing.getSmithingArmors()+i);break;
-            default: throw new RuntimeException("Default should never be reached in switch. FollowerCreationService::randomTalentSwitch");
-
-        }
+    private static void randomTalentsSwitch(EnumMap<Talents,Integer> talentMap, int i){
+        int r = random.nextInt(talentMap.size());
+        Talents[] t = Talents.values();
+        talentMap.put(t[r], talentMap.get(t[r]) +i);
     }
     private static Followers createFollowerBase(){
         Followers follower = new Followers();
@@ -95,116 +83,40 @@ public class FollowerCreationService {
         loadAllRings(follower);
         return follower;
     }
-    private static void createRandomSkillpoints(SkillpointRing skillpointRing, int skillpoints){
+    //Chance auf Magische Skills 33% bei plus, bei minus 50/50
+    private static void createRandomSkillpoints(EnumMap<Skills,Integer> skills, EnumMap<Magicskills, Integer> magicskills, int skillpoints){
         int minuspoints = skillpoints;
         skillpoints = skillpoints + minuspoints;
         while (skillpoints > 0){
             skillpoints--;
-            randomSkillsSwitch(skillpointRing,1);
+            int i = random.nextInt(3);
+            switch (i){
+                case 0:
+                case 1:randomSkillsSwitch(skills,1); break;
+                case 2: randomMagicSkillsSwitch(magicskills, 1); break;
+                default: throw new RuntimeException("This should never be reached - FollowerCreationService::createRandomSkillpoints");
+            }
         }
         while(minuspoints > 0){
             minuspoints--;
-            randomSkillsSwitch(skillpointRing,-1);
+            if(random.nextBoolean()){
+                randomSkillsSwitch(skills,-1);
+            }else {
+                randomMagicSkillsSwitch(magicskills,-1);
+            }
         }
 
 
     }
-    private static void randomSkillsSwitch(SkillpointRing skillpointRing, int i) {
-        switch (random.nextInt(13)) {
-            case 0:
-                skillpointRing.setSwordSkill(skillpointRing.getSwordSkill() + i);
-                break;
-            case 1:
-                skillpointRing.setTwoHandSwordSkill(skillpointRing.getTwoHandSwordSkill() + i);
-                break;
-            case 2:
-                skillpointRing.setBowSkill(skillpointRing.getBowSkill() + i);
-                break;
-            case 3:
-                skillpointRing.setSingleHandMaceSkill(skillpointRing.getSingleHandMaceSkill() + i);
-                break;
-            case 4:
-                skillpointRing.setDaggerSkill(skillpointRing.getDaggerSkill() + i);
-                break;
-            case 5:
-                skillpointRing.setMiningSkill(skillpointRing.getMiningSkill() + i);
-                break;
-            case 6:
-                //Smithing 50:50 chance auf armor oder weapons
-                if (random.nextBoolean()) {
-                    skillpointRing.setSmithingArmorSkill(skillpointRing.getSmithingArmorSkill() + i);
-                } else {
-                    skillpointRing.setSmithingWeaponSkill(skillpointRing.getSmithingWeaponSkill() + i);
-                }
-                break;
-            case 7:
-                //Fire Magic Skills
-                int a = random.nextInt(3);
-                if (a == 1) {
-                    skillpointRing.getFireMagicSkillpointRing().setCastraIgnis(skillpointRing.getFireMagicSkillpointRing().getCastraIgnis() + i);
-                } else if (a == 2) {
-                    skillpointRing.getFireMagicSkillpointRing().setIctumArdere(skillpointRing.getFireMagicSkillpointRing().getIctumArdere() + i);
-                } else {
-                    skillpointRing.getFireMagicSkillpointRing().setSagittaIgnis(skillpointRing.getFireMagicSkillpointRing().getSagittaIgnis() + i);
-                }
-                break;
-            case 8:
-                //Water Magic Skills
-                int b = random.nextInt(3);
-                if (b == 1) {
-                    skillpointRing.getWaterMagicSkillpointRing().setCataractus(skillpointRing.getWaterMagicSkillpointRing().getCataractus()+i);
-                } else if (b == 2) {
-                    skillpointRing.getWaterMagicSkillpointRing().setPluviat(skillpointRing.getWaterMagicSkillpointRing().getPluviat()+i);
-                }else {
-                    skillpointRing.getWaterMagicSkillpointRing().setRemedium_humiditatem(skillpointRing.getWaterMagicSkillpointRing().getRemedium_humiditatem()+i);
-                }
-                break;
-            case 9:
-                //Earth Magic Skills
-                int c = random.nextInt(3);
-                if (c == 1) {
-                    skillpointRing.getEarthMagicSkillpointRing().setSaxa_procidens(skillpointRing.getEarthMagicSkillpointRing().getSaxa_procidens()+i);
-                }else if(c == 2){
-                    skillpointRing.getEarthMagicSkillpointRing().setLapis_lapium_golum(skillpointRing.getEarthMagicSkillpointRing().getLapis_lapium_golum()+i);
-            }else{
-                    skillpointRing.getEarthMagicSkillpointRing().setSignum_fictilis(skillpointRing.getEarthMagicSkillpointRing().getSignum_fictilis()+i);
-                }
-                break;
-            case 10:
-                //Wind Magic Skills
-                int d = random.nextInt(3);
-                if (d == 1) {
-                    skillpointRing.getWindMagicSkillpointRing().setFestatum(skillpointRing.getWindMagicSkillpointRing().getFestatum()+i);
-                } else if (d == 2) {
-                    skillpointRing.getWindMagicSkillpointRing().setFulgurus_radialus(skillpointRing.getWindMagicSkillpointRing().getFulgurus_radialus()+i);
-                } else {
-                    skillpointRing.getWindMagicSkillpointRing().setLiberi_tempest(skillpointRing.getWindMagicSkillpointRing().getLiberi_tempest()+i);
-                }
-                break;
-            case 11:
-                //Status Magic Skills
-                int e = random.nextInt(3);
-                if (e == 1) {
-                    skillpointRing.getStatusMagicSkillpointRing().setVenenum_mortis(skillpointRing.getStatusMagicSkillpointRing().getVenenum_mortis()+i);
-                }else if(e == 2){
-                    skillpointRing.getStatusMagicSkillpointRing().setTelum_mortis(skillpointRing.getStatusMagicSkillpointRing().getTelum_mortis()+i);
-                }else {
-                    skillpointRing.getStatusMagicSkillpointRing().setDormirat(skillpointRing.getStatusMagicSkillpointRing().getDormirat()+i);
-                }
-                break;
-            case 12:
-                //White Magic Skills
-                int f= random.nextInt(3);
-                WhiteMagicSkillpointRing w = skillpointRing.getWhiteMagicSkillpointRing();
-                if (f == 1) {
-                    w.setRex_res_mortem(w.getRex_res_mortem()+i);
-                } else if (f == 2) {
-                    w.setPrismorum(w.getPrismorum()+i);
-                } else {
-                    w.setDormus_vitae(w.getDormus_vitae()+i);
-                }break;
-            default: throw new RuntimeException("Default should never be reached in switch. FollowerCreationService::randomSkillsSwitch");
-        }
+    private static void randomSkillsSwitch(EnumMap<Skills,Integer> e, int i) {
+        int r = random.nextInt(e.size());
+        Skills[] t = Skills.values();
+        e.put(t[r], e.get(t[r]) +i);
+    }
+    private static void randomMagicSkillsSwitch(EnumMap<Magicskills,Integer> e, int i){
+        int r = random.nextInt(e.size());
+        Magicskills[] t = Magicskills.values();
+        e.put(t[r], e.get(t[r]) +i);
 
     }
     private static void createRandomStatPoints(StatsRing sr, int statpoints){
@@ -221,6 +133,41 @@ public class FollowerCreationService {
             }
         }
 
+    }
+    private static void controlMinMaxWerteSkills(EnumMap<Skills,Integer> skills, EnumMap<Magicskills, Integer> magicskills){
+        int minWert = -5;
+        int maxWert = 9;
+        for(Skills s : Skills.values()){
+            if(skills.get(s) < minWert){
+                skills.put(s, minWert);
+            }
+            if(skills.get(s) > maxWert){
+                skills.put(s, maxWert);
+            }
+        }
+        for(Magicskills s : Magicskills.values()){
+            if(magicskills.get(s) < minWert){
+                magicskills.put(s, minWert);
+            }
+            if(magicskills.get(s) > maxWert){
+                magicskills.put(s, maxWert);
+            }
+        }
+    }
+    public static EnumMap<Skills, Integer> createSkillsEnumMap(){
+        EnumMap<Skills, Integer> a = new EnumMap(Skills.class);
+        for(Skills s : Skills.values()){
+            a.put(s,0);
+        }
+        return a;
+
+    }
+    public static EnumMap<Magicskills, Integer>createMagicEnumMap(){
+        EnumMap<Magicskills,Integer> a = new EnumMap(Magicskills.class);
+        for(Magicskills s : Magicskills.values()){
+            a.put(s,0);
+        }
+        return a;
     }
 
 }
