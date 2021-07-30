@@ -15,7 +15,7 @@ public class Followers {
     private EnumMap<Skills,Integer> skills;
     private ExpRing expRing;
     private StatsRing statsRing;
-    //TODO: Equipring!
+    private EquipRing equipRing;
 
 
     /**
@@ -80,4 +80,11 @@ public class Followers {
         return talents;
     }
 
+    public EquipRing getEquipRing() {
+        return equipRing;
+    }
+
+    public void setEquipRing(EquipRing equipRing) {
+        this.equipRing = equipRing;
+    }
 }

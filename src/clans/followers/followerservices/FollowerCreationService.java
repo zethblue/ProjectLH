@@ -42,6 +42,7 @@ public class FollowerCreationService {
 
         EnumMap<Skills, Integer> skillsIntegerEnumMap = createSkillsEnumMap();
         EnumMap<Magicskills,Integer> magicskillsEnumMap = createMagicEnumMap();
+        follower.setEquipRing(new EquipRing());
 
         follower.setSkills(skillsIntegerEnumMap);
         follower.setMagieSkills(magicskillsEnumMap);
